@@ -3,7 +3,7 @@ A modern CRM dashboard designed to manage customers, track revenue, and monitor 
 
 
 🌐 Live Demo
-
+https://mehakprajapati.github.io/BizForce---Business-Growth-Platform/
 ✨ Features
 • Customer Management System
 • Revenue Analytics Dashboard
