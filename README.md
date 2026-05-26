@@ -14,8 +14,8 @@ https://mehakprajapati.github.io/BizForce---Business-Growth-Platform/
 • Real-time Local Storage
 
 🛠️ Tech Stack
-• HTML5
-• CSS3
+• HTML
+• CSS
 • JavaScript
 • Canvas API
 • js PDF
