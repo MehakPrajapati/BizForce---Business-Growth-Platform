@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile View</title>
+
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Outfit',sans-serif;
+}
+
+body{
+background:#f0f4ff;
+padding:40px;
+
+    background-image: url("pic4.png");
+    background-size: cover;
+    background-position: center;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+transition:0.3s;
+}
+
+.profile-box{
+width:100%;
+max-width:700px;
+background:white;
+padding:35px;
+border-radius:24px;
+box-shadow:0 6px 24px rgba(0,0,130,0.08);
+text-align:center;
+transition:0.3s;
+}
+
+.avatar{
+width:110px;
+height:110px;
+border-radius:50%;
+background:linear-gradient(135deg,rgb(0,0,130),rgb(73,190,230));
+display:flex;
+align-items:center;
+justify-content:center;
+margin:auto;
+font-size:42px;
+font-weight:700;
+color:white;
+margin-bottom:20px;
+}
+
+.name{
+font-size:30px;
+font-weight:700;
+color:rgb(0,0,130);
+margin-bottom:6px;
+}
+
+.role{
+font-size:15px;
+color:#666;
+margin-bottom:28px;
+}
+
+.info-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:18px;
+text-align:left;
+margin-top:25px;
+}
+
+.info-card{
+background:#f8faff;
+padding:18px;
+border-radius:16px;
+}
+
+.info-card h4{
+font-size:13px;
+color:#888;
+margin-bottom:8px;
+}
+
+.info-card p{
+font-size:15px;
+font-weight:600;
+color:#222;
+word-break:break-word;
+}
+
+.bio{
+margin-top:22px;
+background:#f8faff;
+padding:18px;
+border-radius:16px;
+text-align:left;
+}
+
+.bio h4{
+font-size:13px;
+color:#888;
+margin-bottom:8px;
+}
+
+.bio p{
+font-size:15px;
+line-height:26px;
+color:#222;
+}
+
+.dark-btn{
+margin-top:28px;
+padding:12px 22px;
+border:none;
+border-radius:12px;
+background:linear-gradient(135deg,rgb(73,190,230),rgb(0,100,200));
+color:white;
+font-size:14px;
+font-weight:600;
+cursor:pointer;
+}
+
+/* DARK MODE */
+
+body.dark-mode{
+background:#0f172a;
+}
+
+body.dark-mode .profile-box{
+background:#1e293b;
+}
+
+body.dark-mode .name{
+color:#7dd3fc;
+}
+
+body.dark-mode .role{
+color:#94a3b8;
+}
+
+body.dark-mode .info-card,
+body.dark-mode .bio{
+background:#334155;
+}
+
+body.dark-mode .info-card h4,
+body.dark-mode .bio h4{
+color:#94a3b8;
+}
+
+body.dark-mode .info-card p,
+body.dark-mode .bio p{
+color:white;
+}
+
+@media(max-width:700px){
+
+.info-grid{
+grid-template-columns:1fr;
+}
+
+body{
+padding:20px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="profile-box">
+
+<div class="avatar" id="avatar">U</div>
+
+<div class="name" id="name">User</div>
+
+<div class="role" id="role">CRM Admin</div>
+
+<div class="info-grid">
+
+<div class="info-card">
+<h4>Email</h4>
+<p id="email">-</p>
+</div>
+
+<div class="info-card">
+<h4>Phone</h4>
+<p id="phone">-</p>
+</div>
+
+<div class="info-card">
+<h4>Location</h4>
+<p id="location">-</p>
+</div>
+
+<div class="info-card">
+<h4>Company</h4>
+<p id="company">-</p>
+</div>
+
+</div>
+
+<div class="bio">
+<h4>Bio</h4>
+<p id="bio">-</p>
+</div>
+
+<button class="dark-btn" onclick="toggleDarkMode()">
+🌙 Toggle Dark Mode
+</button>
+
+</div>
+
+<script>
+
+const userName = localStorage.getItem('bizforce_user') || 'User';
+const role = localStorage.getItem('bizforce_role') || 'CRM Admin';
+const email = localStorage.getItem('bizforce_email') || '-';
+const phone = localStorage.getItem('bizforce_phone') || '-';
+const locationn = localStorage.getItem('bizforce_location') || '-';
+const company = localStorage.getItem('bizforce_company') || '-';
+const bio = localStorage.getItem('bizforce_bio') || '-';
+
+document.getElementById('avatar').textContent =
+userName.charAt(0).toUpperCase();
+
+document.getElementById('name').textContent = userName;
+document.getElementById('role').textContent = role;
+document.getElementById('email').textContent = email;
+document.getElementById('phone').textContent = phone;
+document.getElementById('location').textContent = locationn;
+document.getElementById('company').textContent = company;
+document.getElementById('bio').textContent = bio;
+
+/* DARK MODE */
+
+if(localStorage.getItem("darkMode") === "enabled"){
+document.body.classList.add("dark-mode");
+}
+
+function toggleDarkMode(){
+
+document.body.classList.toggle("dark-mode");
+
+if(document.body.classList.contains("dark-mode")){
+localStorage.setItem("darkMode","enabled");
+}else{
+localStorage.setItem("darkMode","disabled");
+}
+
+}
+
+</script>
+
+</body>
+</html>

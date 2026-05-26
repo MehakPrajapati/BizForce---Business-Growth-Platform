@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BizForce Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Outfit',sans-serif; }
+body{ background:#f4f7ff; padding:30px; }
+
+.welcome-banner{
+  background:linear-gradient(135deg,rgb(0,0,130),rgb(20,80,200));
+  padding:25px 30px; border-radius:18px; color:white;
+  margin-bottom:25px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.welcome-banner h2{ font-size:26px; margin-bottom:4px; }
+.welcome-banner p{ font-size:14px; opacity:0.8; }
+
+.dark-toggle{
+  background:rgba(255,255,255,0.15); border:none; border-radius:12px;
+  padding:10px 16px; font-size:20px; cursor:pointer; transition:0.2s;
+}
+.dark-toggle:hover{ background:rgba(255,255,255,0.25); }
+
+.panel{
+  background:white; padding:24px; border-radius:18px;
+  box-shadow:0 4px 18px rgba(0,0,130,0.08); margin-bottom:25px;
+}
+.panel-header{
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;
+}
+.panel-title{ font-size:18px; font-weight:600; color:rgb(0,0,130); }
+
+.stats-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:18px; margin-bottom:25px;
+}
+.stat-card{
+  background:white; padding:20px; border-radius:18px;
+  box-shadow:0 4px 18px rgba(0,0,130,0.08);
+  transition:0.3s;
+}
+.stat-card:hover{ transform:translateY(-3px); }
+.stat-icon{ width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+.stat-num{ font-size:28px; font-weight:700; color:rgb(0,0,130); margin-top:12px; word-break:break-all; }
+.stat-label{ font-size:13px; color:#888; margin-top:4px; }
+
+/* FORM */
+.form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-bottom:20px; }
+.form-input{
+  padding:12px 14px; border-radius:10px; border:1.5px solid #dbe4ff;
+  outline:none; font-size:14px; font-family:'Outfit',sans-serif; width:100%;
+  transition:0.2s;
+}
+.form-input:focus{ border-color:rgb(73,190,230); box-shadow:0 0 0 3px rgba(73,190,230,0.12); }
+.add-btn{
+  background:linear-gradient(135deg,rgb(73,190,230),rgb(0,100,200));
+  color:white; border:none; padding:12px 20px;
+  border-radius:10px; cursor:pointer; font-weight:600;
+  font-family:'Outfit',sans-serif; font-size:14px; transition:0.2s;
+  width:100%;
+}
+.add-btn:hover{ background:linear-gradient(135deg,rgb(0,0,130),rgb(0,70,160)); transform:translateY(-1px); }
+
+/* SEARCH */
+.search-wrap{ position:relative; margin-bottom:20px; }
+.search-wrap i{ position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#aaa; font-size:16px; }
+.search-input{ padding:12px 14px 12px 40px; border-radius:10px; border:1.5px solid #dbe4ff; outline:none; font-size:14px; font-family:'Outfit',sans-serif; width:100%; transition:0.2s; }
+.search-input:focus{ border-color:rgb(73,190,230); }
+
+/* TABLE */
+.table-wrap{ overflow-x:auto; }
+table{ width:100%; border-collapse:collapse; }
+thead th{ font-size:12px; font-weight:600; color:#999; text-align:left; padding:10px 14px; background:#f8faff; }
+tbody tr{ transition:0.2s; }
+tbody tr:hover{ background:#f8faff; }
+tbody td{ font-size:13px; color:#333; padding:12px 14px; border-bottom:1px solid #f0f0f0; }
+.customer-name{ display:flex; align-items:center; gap:10px; }
+.cust-avatar{ width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:white; flex-shrink:0; }
+.status-pill{ font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; }
+.action-btn{ border:none; padding:6px 12px; border-radius:8px; cursor:pointer; margin-right:5px; font-size:12px; font-weight:600; transition:0.2s; }
+.edit-btn{ background:#e6f1fb; color:rgb(0,0,130); }
+.edit-btn:hover{ background:#d0e4f7; }
+.delete-btn{ background:#ffe8e8; color:#c62828; }
+.delete-btn:hover{ background:#ffd0d0; }
+
+/* CHART */
+.chart-container{ position:relative; height:260px; width:100%; }
+
+/* TOAST */
+#toastMsg{
+  position:fixed; bottom:28px; right:28px;
+  background:rgb(0,0,130); color:white;
+  padding:12px 20px; border-radius:12px;
+  font-size:14px; font-weight:500;
+  display:none; z-index:9999;
+  box-shadow:0 6px 20px rgba(0,0,130,0.3);
+}
+
+/* DARK MODE */
+body.dark-mode{ background:#0f172a; color:white; }
+body.dark-mode .panel,
+body.dark-mode .stat-card{ background:#1e293b; }
+body.dark-mode .panel-title,
+body.dark-mode .stat-num{ color:#7dd3fc; }
+body.dark-mode label{
+  color:#e2e8f0 !important;
+}
+body.dark-mode .stat-label{ color:#94a3b8; }
+body.dark-mode thead th{ background:#334155; color:#94a3b8; }
+body.dark-mode tbody td{ color:#e2e8f0; border-color:#334155; }
+body.dark-mode tbody tr:hover{ background:#334155; }
+body.dark-mode .form-input,
+body.dark-mode .search-input{ background:#334155; border-color:#475569; color:white; }
+</style>
+</head>
+<body>
+    <div id="dashboardContent">
+
+<div class="welcome-banner">
+  <div>
+    <h2 id="welcomeText">Your CRM is ready 🚀</h2>
+    <p>Add customers and track revenue in real-time.</p>
+  </div>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+</div>
+
+
+<!-- ADD CUSTOMER FORM -->
+<div class="panel-header">
+  <span class="panel-title">Customer Management</span>
+
+  <div style="display:flex;gap:10px;">
+
+    <button onclick="exportCSV()" id="exportBtn"
+      style="display:flex;align-items:center;gap:6px;
+      padding:9px 16px;
+      background:linear-gradient(135deg,rgb(73,190,230),rgb(0,100,200));
+      color:white;
+      border:none;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;">
+
+      <i class="ri-download-2-line"></i>
+      Export PDF
+    </button>
+
+    <a href="profile.html"
+      style="display:flex;align-items:center;gap:6px;
+      padding:9px 16px;
+      background:#e6f1fb;
+      color:rgb(0,0,130);
+      border:none;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      text-decoration:none;">
+
+      <i class="ri-user-line"></i>
+      Profile
+    </a>
+
+  </div>
+</div>
+
+  <div class="search-wrap">
+    <i class="ri-search-line"></i>
+    <input type="text" id="searchCustomer" placeholder="Search by name or company..." class="search-input">
+  </div>
+
+  <form id="customerForm">
+    <div class="form-grid">
+      <div><label style="font-size:12px;font-weight:600;color:rgb(0,0,130);display:block;margin-bottom:5px;">Customer Name *</label>
+        <input type="text" id="custName" placeholder="Priya Sharma" required class="form-input"></div>
+      <div><label style="font-size:12px;font-weight:600;color:rgb(0,0,130);display:block;margin-bottom:5px;">Email *</label>
+        <input type="email" id="custEmail" placeholder="priya@company.com" required class="form-input"></div>
+      <div><label style="font-size:12px;font-weight:600;color:rgb(0,0,130);display:block;margin-bottom:5px;">Company *</label>
+        <input type="text" id="custCompany" placeholder="TechNova Pvt Ltd" required class="form-input"></div>
+      <div><label style="font-size:12px;font-weight:600;color:rgb(0,0,130);display:block;margin-bottom:5px;">Deal Value (₹) *</label>
+        <input type="number" id="custRevenue" placeholder="120000" required class="form-input" min="0" max="99999999"></div>
+      <div><label style="font-size:12px;font-weight:600;color:rgb(0,0,130);display:block;margin-bottom:5px;">Join Date</label>
+        <input type="date" id="custJoined" class="form-input"></div>
+      <div><label style="font-size:12px;font-weight:600;color:rgb(0,0,130);display:block;margin-bottom:5px;">Status</label>
+        <select id="custStatus" class="form-input">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select></div>
+    </div>
+    <button type="submit" class="add-btn" id="submitBtn">+ Add Customer</button>
+  </form>
+
+  <div class="table-wrap" style="margin-top:24px;">
+    <table>
+      <thead>
+        <tr><th>Customer</th><th>Email</th><th>Company</th><th>Deal Value</th><th>Status</th><th>Joined</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="customerTableBody"></tbody>
+    </table>
+    <p id="emptyMsg" style="text-align:center;padding:30px;color:#aaa;font-size:14px;">No customers yet. Add your first customer above!</p>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#e6f1fb;"><i class="ri-user-line" style="color:rgb(0,0,130);"></i></div>
+    <div class="stat-num" id="totalCustomersStat">0</div>
+    <div class="stat-label">Total Customers</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#eaf3de;"><i class="ri-money-rupee-circle-line" style="color:#3B6D11;"></i></div>
+    <div class="stat-num" id="revenueStat">₹0</div>
+    <div class="stat-label">Total Revenue</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#eaf3de;"><i class="ri-user-follow-line" style="color:#27500A;"></i></div>
+    <div class="stat-num" id="activeCustomersStat">0</div>
+    <div class="stat-label">Active Customers</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:#ffeaea;"><i class="ri-user-unfollow-line" style="color:#c62828;"></i></div>
+    <div class="stat-num" id="inactiveCustomersStat">0</div>
+    <div class="stat-label">Inactive Customers</div>
+  </div>
+</div>
+
+<!-- LINE CHART -->
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Customer Analytics — Revenue Overview</span>
+  </div>
+  <div class="chart-container">
+    <canvas id="revenueChart"></canvas>
+  </div>
+</div>
+
+<div id="toastMsg"></div>
+</div>
+<script>
+  // Welcome name
+  const userName = localStorage.getItem('bizforce_user');
+  if (userName) document.getElementById('welcomeText').textContent = `Welcome back, ${userName} 👋`;
+
+  let customers = JSON.parse(localStorage.getItem('bizforceCustomers')) || [];
+  let editIndex = null;
+  const avatarColors = ['rgb(0,0,130)','rgb(73,190,230)','#BA7517','#3B6D11','#A32D2D','#6B21A8','#0369A1','#0F766E'];
+
+  // Format revenue nicely — cap display
+  function formatRevenue(val) {
+    const num = Number(val) || 0;
+    if (num >= 10000000) return '₹' + (num/10000000).toFixed(1) + 'Cr';
+    if (num >= 100000)   return '₹' + (num/100000).toFixed(1) + 'L';
+    if (num >= 1000)     return '₹' + (num/1000).toFixed(1) + 'K';
+    return '₹' + num.toLocaleString('en-IN');
+  }
+
+  function renderCustomers(data) {
+    const list = data !== undefined ? data : customers;
+    const tbody = document.getElementById('customerTableBody');
+    const empty = document.getElementById('emptyMsg');
+    tbody.innerHTML = '';
+    empty.style.display = list.length === 0 ? 'block' : 'none';
+
+    list.forEach((c, i) => {
+      const color = avatarColors[i % avatarColors.length];
+      const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      const statusStyle = c.status === 'Active'
+        ? 'background:#eaf3de;color:#27500A;'
+        : 'background:#ffeaea;color:#c62828;';
+      const joinedDisplay = c.joined
+        ? new Date(c.joined).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})
+        : '-';
+
+      tbody.innerHTML += `
+        <tr>
+          <td><div class="customer-name">
+            <div class="cust-avatar" style="background:${color};">${initials}</div>
+            ${c.name}
+          </div></td>
+          <td>${c.email}</td>
+          <td>${c.company}</td>
+          <td>${formatRevenue(c.revenue)}</td>
+          <td><span class="status-pill" style="${statusStyle}">${c.status}</span></td>
+          <td>${joinedDisplay}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="editCustomer(${i})"><i class="ri-edit-line"></i> Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteCustomer(${i})"><i class="ri-delete-bin-line"></i></button>
+          </td>
+        </tr>`;
+    });
+
+    updateStats();
+    drawChart();
+    localStorage.setItem('bizforceCustomers', JSON.stringify(customers));
+  }
+
+  document.getElementById('customerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const revenue = Number(document.getElementById('custRevenue').value);
+    if (revenue > 99999999) {
+      showToast('⚠️ Max deal value ₹9.9Cr allowed');
+      return;
+    }
+    const customer = {
+      name:    document.getElementById('custName').value.trim(),
+      email:   document.getElementById('custEmail').value.trim(),
+      company: document.getElementById('custCompany').value.trim(),
+      revenue: revenue,
+      status:  document.getElementById('custStatus').value,
+      joined:  document.getElementById('custJoined').value || new Date().toISOString().split('T')[0]
+    };
+    if (editIndex === null) {
+      customers.unshift(customer);
+      showToast('Customer Added 🚀');
+    } else {
+      customers[editIndex] = customer;
+      editIndex = null;
+      document.getElementById('submitBtn').textContent = '+ Add Customer';
+      showToast('Customer Updated ✨');
+    }
+    this.reset();
+    renderCustomers();
+  });
+
+  function editCustomer(i) {
+    const c = customers[i];
+    document.getElementById('custName').value = c.name;
+    document.getElementById('custEmail').value = c.email;
+    document.getElementById('custCompany').value = c.company;
+    document.getElementById('custRevenue').value = c.revenue;
+    document.getElementById('custStatus').value = c.status;
+    document.getElementById('custJoined').value = c.joined || '';
+    editIndex = i;
+    document.getElementById('submitBtn').textContent = '✔ Update Customer';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function deleteCustomer(i) {
+    customers.splice(i, 1);
+    renderCustomers();
+    showToast('Customer Deleted ❌');
+  }
+
+  document.getElementById('searchCustomer').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    renderCustomers(customers.filter(c =>
+      c.name.toLowerCase().includes(q) || c.company.toLowerCase().includes(q)
+    ));
+  });
+
+  function updateStats() {
+    const total    = customers.length;
+    const active   = customers.filter(c=>c.status==='Active').length;
+    const inactive = customers.filter(c=>c.status==='Inactive').length;
+    const revenue  = customers.reduce((s,c)=>s+(Number(c.revenue)||0), 0);
+    document.getElementById('totalCustomersStat').textContent  = total;
+    document.getElementById('activeCustomersStat').textContent = active;
+    document.getElementById('inactiveCustomersStat').textContent = inactive;
+    document.getElementById('revenueStat').textContent = formatRevenue(revenue);
+  }
+
+  /* ===== LINE CHART ===== */
+  let chartInstance = null;
+
+  function drawChart() {
+    const canvas = document.getElementById('revenueChart');
+    const ctx = canvas.getContext('2d');
+
+    // Group revenue by month
+    const months = {};
+    customers.forEach(c => {
+      const d = new Date(c.joined || new Date().toISOString().split('T')[0]);
+      const key = d.toLocaleString('en-IN', {month:'short', year:'2-digit'});
+      months[key] = (months[key] || 0) + (Number(c.revenue) || 0);
+    });
+
+    const labels = Object.keys(months);
+    const data   = Object.values(months);
+
+    if (chartInstance) chartInstance.destroy();
+
+    if (labels.length === 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = '14px Outfit';
+      ctx.fillStyle = '#aaa';
+      ctx.textAlign = 'center';
+      ctx.fillText('Add customers with dates to see the chart', canvas.width/2, 130);
+      return;
+    }
+
+    // Draw line chart manually
+    const W = canvas.offsetWidth || 700;
+    const H = 240;
+    canvas.width  = W;
+    canvas.height = H;
+
+    const pad = { top:20, right:30, bottom:40, left:70 };
+    const chartW = W - pad.left - pad.right;
+    const chartH = H - pad.top  - pad.bottom;
+    const maxVal = Math.max(...data) * 1.2 || 1;
+
+    ctx.clearRect(0,0,W,H);
+
+    // Grid lines
+    const gridLines = 5;
+    for (let i=0; i<=gridLines; i++) {
+      const y = pad.top + chartH - (i/gridLines)*chartH;
+      ctx.beginPath();
+      ctx.strokeStyle = '#e8eeff';
+      ctx.lineWidth = 1;
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + chartW, y);
+      ctx.stroke();
+      // Y label
+      const val = (maxVal * i/gridLines);
+      ctx.fillStyle = '#aaa';
+      ctx.font = '11px Outfit';
+      ctx.textAlign = 'right';
+      ctx.fillText(formatRevenue(val), pad.left - 8, y + 4);
+    }
+
+    // Points
+    const pts = labels.map((l, i) => ({
+      x: pad.left + (i / (labels.length-1 || 1)) * chartW,
+      y: pad.top  + chartH - (data[i]/maxVal) * chartH,
+      val: data[i], label: l
+    }));
+
+    // Fill area under line
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pad.top + chartH);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length-1].x, pad.top + chartH);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top+chartH);
+    grad.addColorStop(0,   'rgba(73,190,230,0.25)');
+    grad.addColorStop(1,   'rgba(73,190,230,0)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle = 'rgb(0,0,130)';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Dots + labels
+    pts.forEach(p => {
+      // Dot
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
+      ctx.fillStyle = 'rgb(73,190,230)';
+      ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Value above dot
+      ctx.fillStyle = 'rgb(0,0,130)';
+      ctx.font = 'bold 11px Outfit';
+      ctx.textAlign = 'center';
+      ctx.fillText(formatRevenue(p.val), p.x, p.y - 10);
+
+      // X label
+      ctx.fillStyle = '#888';
+      ctx.font = '11px Outfit';
+      ctx.fillText(p.label, p.x, pad.top + chartH + 20);
+    });
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toastMsg');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 2500);
+  }
+
+  renderCustomers();
+  window.addEventListener('resize', drawChart);
+  /* ===== EXPORT STRUCTURED PDF ===== */
+  async function exportCSV() {
+    if (customers.length === 0) {
+      showToast('⚠️ No customers to export!');
+      return;
+    }
+    showToast('Generating PDF...');
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const W = 210; // A4 width mm
+    const margin = 14;
+    let y = 0;
+
+    // ── HEADER BANNER ──────────────────────────────────────────
+    pdf.setFillColor(0, 0, 130);
+    pdf.rect(0, 0, W, 32, 'F');
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(18);
+    pdf.text('BizForce CRM — Dashboard Report', margin, 13);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    const now = new Date().toLocaleString('en-IN', {
+      day: 'numeric', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+    pdf.text('Generated: ' + now, margin, 21);
+    const userName2 = localStorage.getItem('bizforce_user') || 'Admin';
+    pdf.text('Exported by: ' + userName2, margin, 27);
+    y = 40;
+
+    // ── SUMMARY STATS ──────────────────────────────────────────
+    const total    = customers.length;
+    const active   = customers.filter(c => c.status === 'Active').length;
+    const inactive = customers.filter(c => c.status === 'Inactive').length;
+    const revenue  = customers.reduce((s, c) => s + (Number(c.revenue) || 0), 0);
+
+    const cards = [
+      { label: 'Total Customers', value: String(total),            color: [0, 0, 130] },
+      { label: 'Active',          value: String(active),           color: [39, 80, 10] },
+      { label: 'Inactive',        value: String(inactive),         color: [198, 40, 40] },
+      { 
+  label: 'Total Revenue',
+  value: 'Rs. ' + revenue.toLocaleString('en-IN'),
+  color: [3, 105, 161]
+}, ];
+
+    const cardW = (W - margin * 2 - 12) / 4;
+    cards.forEach((card, i) => {
+      const x = margin + i * (cardW + 4);
+      pdf.setFillColor(248, 250, 255);
+      pdf.roundedRect(x, y, cardW, 22, 3, 3, 'F');
+      pdf.setDrawColor(220, 228, 255);
+      pdf.roundedRect(x, y, cardW, 22, 3, 3, 'S');
+
+      pdf.setTextColor(...card.color);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(14);
+      pdf.text(card.value, x + cardW / 2, y + 11, { align: 'center' });
+
+      pdf.setTextColor(120, 120, 120);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.text(card.label, x + cardW / 2, y + 18, { align: 'center' });
+    });
+    y += 30;
+
+    // ── REVENUE CHART (canvas → image) ──────────────────────────
+    // Draw a fresh offscreen canvas for clean PDF render
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width  = 900;
+    offCanvas.height = 280;
+    const ctx = offCanvas.getContext('2d');
+
+    // Group revenue by month
+    const months = {};
+    customers.forEach(c => {
+      const d = new Date(c.joined || new Date().toISOString().split('T')[0]);
+      const key = d.toLocaleString('en-IN', { month: 'short', year: '2-digit' });
+      months[key] = (months[key] || 0) + (Number(c.revenue) || 0);
+    });
+    const labels = Object.keys(months);
+    const data   = Object.values(months);
+
+    if (labels.length >= 1) {
+      const cW = offCanvas.width, cH = offCanvas.height;
+      const pad = { top: 30, right: 30, bottom: 50, left: 90 };
+      const chartW = cW - pad.left - pad.right;
+      const chartH = cH - pad.top  - pad.bottom;
+      const maxVal = Math.max(...data) * 1.2 || 1;
+
+      // White bg
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, cW, cH);
+
+      // Grid
+      for (let i = 0; i <= 5; i++) {
+        const gy = pad.top + chartH - (i / 5) * chartH;
+        ctx.beginPath();
+        ctx.strokeStyle = '#e8eeff';
+        ctx.lineWidth = 1;
+        ctx.moveTo(pad.left, gy);
+        ctx.lineTo(pad.left + chartW, gy);
+        ctx.stroke();
+        ctx.fillStyle = '#999';
+        ctx.font = '13px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillText(formatRevenue(maxVal * i / 5), pad.left - 8, gy + 4);
+      }
+
+      // Points
+      const pts = labels.map((l, i) => ({
+        x: pad.left + (i / Math.max(labels.length - 1, 1)) * chartW,
+        y: pad.top  + chartH - (data[i] / maxVal) * chartH,
+        val: data[i], label: l
+      }));
+
+      // Fill area
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pad.top + chartH);
+      pts.forEach(p => ctx.lineTo(p.x, p.y));
+      ctx.lineTo(pts[pts.length - 1].x, pad.top + chartH);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+      grad.addColorStop(0, 'rgba(73,190,230,0.3)');
+      grad.addColorStop(1, 'rgba(73,190,230,0)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Line
+      ctx.beginPath();
+      pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+      ctx.strokeStyle = 'rgb(0,0,130)';
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // Dots + labels
+      pts.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgb(73,190,230)';
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgb(0,0,130)';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+ 'Rs. ' + Number(p.val).toLocaleString('en-IN'),
+  p.x,
+  p.y - 12
+);
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Arial';
+        ctx.fillText(p.label, p.x, pad.top + chartH + 22);
+      });
+
+      // Title
+      ctx.fillStyle = 'rgb(0,0,130)';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'left';
+      ctx.fillText('Revenue Overview (by Month)', pad.left, 20);
+
+      const chartImg = offCanvas.toDataURL('image/png');
+      const chartH_mm = 55;
+      const chartW_mm = W - margin * 2;
+
+      // Section title
+      pdf.setTextColor(0, 0, 130);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(11);
+      pdf.text('Revenue Chart', margin, y + 5);
+      y += 8;
+
+      pdf.addImage(chartImg, 'PNG', margin, y, chartW_mm, chartH_mm);
+      y += chartH_mm + 8;
+    }
+
+    // ── CUSTOMER TABLE ─────────────────────────────────────────
+    // Check space for new page
+    if (y > 230) { pdf.addPage(); y = 16; }
+
+    pdf.setTextColor(0, 0, 130);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(11);
+    pdf.text('All Customers (' + total + ')', margin, y);
+    y += 6;
+
+    // Table header
+    const cols = [
+      { label: '#',           w: 8  },
+      { label: 'Name',        w: 36 },
+      { label: 'Email',       w: 46 },
+      { label: 'Company',     w: 34 },
+      { label: 'Deal Value',  w: 24 },
+      { label: 'Status',      w: 20 },
+      { label: 'Joined',      w: 22 },
+    ];
+    const rowH = 8;
+
+    // Header row
+    pdf.setFillColor(0, 0, 130);
+    pdf.rect(margin, y, W - margin * 2, rowH, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    let cx = margin + 2;
+    cols.forEach(col => {
+      pdf.text(col.label, cx, y + 5.5);
+      cx += col.w;
+    });
+    y += rowH;
+
+    // Data rows
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(7.5);
+
+    customers.forEach((c, idx) => {
+      if (y > 275) { pdf.addPage(); y = 16; }
+
+      // Alternating row bg
+      if (idx % 2 === 0) {
+        pdf.setFillColor(248, 250, 255);
+        pdf.rect(margin, y, W - margin * 2, rowH, 'F');
+      }
+
+      // Status color
+      const isActive = c.status === 'Active';
+      const joinedDisplay = c.joined
+        ? new Date(c.joined).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '-';
+
+      const rowData = [
+        String(idx + 1),
+        c.name.length > 18 ? c.name.slice(0, 17) + '…' : c.name,
+        c.email.length > 26 ? c.email.slice(0, 25) + '…' : c.email,
+        c.company.length > 18 ? c.company.slice(0, 17) + '…' : c.company,
+      'Rs. ' + Number(c.revenue).toLocaleString('en-IN'),
+        c.status,
+        joinedDisplay,
+      ];
+
+      cx = margin + 2;
+      rowData.forEach((val, vi) => {
+        if (vi === 5) {
+          // Status pill color
+          pdf.setTextColor(isActive ? 39 : 198, isActive ? 80 : 40, isActive ? 10 : 40);
+          pdf.setFont('helvetica', 'bold');
+        } else {
+          pdf.setTextColor(50, 50, 50);
+          pdf.setFont('helvetica', 'normal');
+        }
+        pdf.text(val, cx, y + 5.5);
+        cx += cols[vi].w;
+      });
+
+      // Bottom border
+      pdf.setDrawColor(235, 238, 255);
+      pdf.line(margin, y + rowH, margin + W - margin * 2, y + rowH);
+      y += rowH;
+    });
+
+    // ── FOOTER ─────────────────────────────────────────────────
+    const totalPages = pdf.internal.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      pdf.setPage(p);
+      pdf.setFillColor(0, 0, 130);
+      pdf.rect(0, 287, W, 10, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(7.5);
+      pdf.text('BizForce CRM  •  Confidential', margin, 293);
+      pdf.text('Page ' + p + ' of ' + totalPages, W - margin, 293, { align: 'right' });
+    }
+
+    pdf.save('BizForce_CRM_Report.pdf');
+    showToast('PDF Downloaded 🚀');
+  }
+</script> 
+</body>
+</html>

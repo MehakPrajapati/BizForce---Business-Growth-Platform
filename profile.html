@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BizForce – Profile</title>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit',sans-serif; }
+body { display:flex; min-height:100vh; background:#f0f4ff; }
+
+/* SIDEBAR */
+#sidebar { width:230px; min-height:100vh; background:linear-gradient(180deg,rgb(0,0,130),rgb(0,15,90)); display:flex; flex-direction:column; position:fixed; top:0; left:0; z-index:100; }
+.sidebar-brand { display:flex; align-items:center; gap:10px; padding:22px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+.sidebar-brand i { font-size:26px; color:rgb(73,190,230); }
+.sidebar-brand span { font-size:20px; font-weight:700; color:white; }
+.sidebar-menu { padding:16px 0; flex:1; }
+.menu-label { font-size:10px; color:rgba(255,255,255,0.35); letter-spacing:1.5px; padding:14px 20px 5px; text-transform:uppercase; }
+.menu-item { display:flex; align-items:center; gap:12px; padding:11px 20px; color:rgba(255,255,255,0.65); font-size:14px; font-weight:500; cursor:pointer; transition:0.2s; text-decoration:none; border-left:3px solid transparent; }
+.menu-item:hover { background:rgba(255,255,255,0.07); color:white; }
+.menu-item.active { background:rgba(73,190,230,0.18); color:white; border-left:3px solid rgb(73,190,230); }
+.menu-item i { font-size:17px; }
+.sidebar-user { padding:14px 20px; border-top:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; gap:10px; }
+.user-avatar { width:34px; height:34px; border-radius:50%; background:rgb(73,190,230); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; flex-shrink:0; }
+.user-info p { font-size:13px; font-weight:600; color:white; }
+.user-info span { font-size:11px; color:rgba(255,255,255,0.45); }
+.logout-btn { margin-left:auto; background:none; border:none; color:rgba(255,255,255,0.45); font-size:17px; cursor:pointer; }
+.logout-btn:hover { color:white; }
+
+/* MAIN */
+#main-content { margin-left:230px; flex:1; padding:32px; }
+
+.page-title { font-size:22px; font-weight:700; color:rgb(0,0,130); margin-bottom:24px; }
+
+.profile-grid { display:grid; grid-template-columns:320px 1fr; gap:24px; align-items:start; }
+
+/* PROFILE CARD */
+.profile-card { background:white; border-radius:20px; padding:32px; box-shadow:0 4px 18px rgba(0,0,130,0.08); text-align:center; }
+
+.avatar-wrap { position:relative; display:inline-block; margin-bottom:20px; }
+.big-avatar { width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,rgb(0,0,130),rgb(73,190,230)); display:flex; align-items:center; justify-content:center; font-size:38px; font-weight:700; color:white; margin:0 auto; }
+.avatar-edit { position:absolute; bottom:4px; right:4px; width:28px; height:28px; border-radius:50%; background:rgb(73,190,230); border:2px solid white; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; color:white; }
+
+.profile-name { font-size:20px; font-weight:700; color:rgb(0,0,130); margin-bottom:4px; }
+.profile-role { font-size:13px; color:#888; margin-bottom:20px; }
+
+.profile-stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.p-stat { background:#f8faff; border-radius:12px; padding:14px; }
+.p-stat-num { font-size:20px; font-weight:700; color:rgb(0,0,130); }
+.p-stat-label { font-size:11px; color:#888; margin-top:2px; }
+
+.profile-badge { display:inline-flex; align-items:center; gap:6px; background:#eaf3de; color:#27500A; font-size:12px; font-weight:600; padding:6px 14px; border-radius:20px; }
+
+/* EDIT FORM */
+.edit-card { background:white; border-radius:20px; padding:32px; box-shadow:0 4px 18px rgba(0,0,130,0.08); }
+.edit-card h3 { font-size:16px; font-weight:600; color:rgb(0,0,130); margin-bottom:22px; padding-bottom:12px; border-bottom:1px solid #f0f4ff; }
+
+.form-group { margin-bottom:18px; }
+.form-group label { display:block; font-size:12px; font-weight:600; color:rgb(0,0,130); margin-bottom:6px; }
+.form-input { width:100%; padding:12px 14px; border:1.5px solid #e0e7ff; border-radius:10px; font-size:14px; font-family:'Outfit',sans-serif; color:#333; background:#f8faff; outline:none; transition:0.2s; }
+.form-input:focus { border-color:rgb(73,190,230); background:white; box-shadow:0 0 0 3px rgba(73,190,230,0.12); }
+.form-input:disabled { background:#f0f0f0; color:#aaa; cursor:not-allowed; }
+
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+.save-btn { width:100%; padding:13px; background:linear-gradient(135deg,rgb(73,190,230),rgb(0,100,200)); color:white; border:none; border-radius:10px; font-size:15px; font-weight:600; font-family:'Outfit',sans-serif; cursor:pointer; transition:0.2s; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; }
+.save-btn:hover { background:linear-gradient(135deg,rgb(0,0,130),rgb(0,70,160)); transform:translateY(-1px); }
+
+/* Activity */
+.activity-section { background:white; border-radius:20px; padding:24px; box-shadow:0 4px 18px rgba(0,0,130,0.08); margin-top:24px; }
+.activity-section h3 { font-size:15px; font-weight:600; color:rgb(0,0,130); margin-bottom:16px; }
+.act-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f5f5f5; }
+.act-item:last-child { border-bottom:none; }
+.act-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.act-text p { font-size:13px; font-weight:500; color:#333; }
+.act-text span { font-size:11px; color:#bbb; }
+
+/* TOAST */
+#toast { position:fixed; bottom:26px; right:26px; background:rgb(0,0,130); color:white; padding:12px 20px; border-radius:12px; font-size:14px; font-weight:500; display:none; z-index:999; box-shadow:0 6px 20px rgba(0,0,130,0.3); }
+
+@media(max-width:900px) {
+  #sidebar { width:56px; }
+  .sidebar-brand span,.menu-label,.menu-item span,.user-info,.logout-btn { display:none; }
+  .menu-item { justify-content:center; padding:14px; }
+  #main-content { margin-left:56px; padding:20px; }
+  .profile-grid { grid-template-columns:1fr; }
+  .form-row { grid-template-columns:1fr; }
+}
+/* ================= DARK MODE ================= */
+
+body.dark-mode{
+background:#0f172a;
+color:white;
+}
+
+body.dark-mode #main-content{
+background:#0f172a;
+}
+
+body.dark-mode .profile-card,
+body.dark-mode .edit-card,
+body.dark-mode .activity-section{
+background:#1e293b;
+box-shadow:none;
+}
+
+body.dark-mode .profile-name,
+body.dark-mode .page-title,
+body.dark-mode .edit-card h3,
+body.dark-mode .p-stat-num{
+color:#7dd3fc;
+}
+
+body.dark-mode .profile-role,
+body.dark-mode .p-stat-label,
+body.dark-mode .act-text span{
+color:#94a3b8;
+}
+
+body.dark-mode .p-stat{
+background:#334155;
+}
+
+body.dark-mode .form-input{
+background:#334155;
+border-color:#475569;
+color:white;
+}
+
+body.dark-mode .act-item{
+border-color:#334155;
+}
+
+body.dark-mode .act-text p{
+color:white;
+}
+.view-profile-btn{
+text-decoration:none;
+font-weight:600;
+font-size:16px;
+color:rgb(0,0,130);
+transition:0.3s;
+}
+
+body.dark-mode .view-profile-btn{
+color:#7dd3fc;
+}
+body.dark-mode .form-group label{
+color:#7dd3fc !important;
+}
+
+body.dark-mode input,
+body.dark-mode textarea{
+color:white !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder{
+color:#94a3b8 !important;
+}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="sidebar-brand">
+    <i class="ri-briefcase-4-fill"></i>
+    <span>BizForce</span>
+  </div>
+  <nav class="sidebar-menu">
+    <div class="menu-label">Main</div>
+    <a class="menu-item" href="dashboard.html"><i class="ri-dashboard-line"></i><span>Dashboard</span></a>
+    <a class="menu-item active" href="profile.html"><i class="ri-user-line"></i><span>Profile</span></a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-avatar">M</div>
+    <div class="user-info"><p id="sidebar-name">User</p><span>Admin</span></div>
+    <button class="logout-btn" onclick="handleLogout()"><i class="ri-logout-box-line"></i></button>
+  </div>
+</div>
+
+<div id="main-content">
+  <div class="page-title">My Profile</div>
+  
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+<a href="profile-view.html" class="view-profile-btn">
+View Profile
+</a>>
+
+  <div class="profile-grid">
+    
+
+    <!-- LEFT: Profile Card -->
+    <div>
+      <div class="profile-card">
+        <div class="avatar-wrap">
+          <div class="big-avatar" id="bigAvatar">M</div>
+          <div class="avatar-edit"><i class="ri-pencil-line"></i></div>
+        </div>
+        <div class="profile-name" id="displayName">User</div>
+        <div class="profile-role" id="displayRole">CRM Admin · BizForce</div>
+        <div class="profile-stats">
+          <div class="p-stat">
+            <div class="p-stat-num" id="statCust">0</div>
+            <div class="p-stat-label">Customers</div>
+          </div>
+          <div class="p-stat">
+            <div class="p-stat-num" id="statRev">₹0</div>
+            <div class="p-stat-label">Revenue</div>
+          </div>
+        </div>
+        <div class="profile-badge"><i class="ri-shield-check-line"></i> Verified Admin</div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="activity-section">
+        <h3>Recent Activity</h3>
+        <div class="act-item">
+          <div class="act-icon" style="background:#e6f1fb;"><i class="ri-user-add-line" style="color:rgb(0,0,130);"></i></div>
+          <div class="act-text"><p>Logged into BizForce</p><span>Just now</span></div>
+        </div>
+        <div class="act-item">
+          <div class="act-icon" style="background:#eaf3de;"><i class="ri-checkbox-circle-line" style="color:#3B6D11;"></i></div>
+          <div class="act-text"><p>Customer data updated</p><span>Today</span></div>
+        </div>
+        <div class="act-item">
+          <div class="act-icon" style="background:#faeeda;"><i class="ri-line-chart-line" style="color:#BA7517;"></i></div>
+          <div class="act-text"><p>Analytics report viewed</p><span>Yesterday</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Edit Form -->
+    <div class="edit-card">
+      <h3><i class="ri-edit-line" style="margin-right:6px;"></i>Edit Profile Information</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="inp-name" class="form-input" placeholder="Mehak Prajapati">
+        </div>
+        <div class="form-group">
+          <label>Role / Designation</label>
+          <input type="text" id="inp-role" class="form-input" placeholder="CRM Admin">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="inp-email" class="form-input" placeholder="mehak@bizforce.com">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="inp-phone" class="form-input" placeholder="+91 98765 43210">
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="inp-location" class="form-input" placeholder="Delhi, India">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Company / Organization</label>
+        <input type="text" id="inp-company" class="form-input" placeholder="BizForce Pvt Ltd">
+      </div>
+
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea id="inp-bio" class="form-input" rows="3" placeholder="CRM Admin managing customer relationships and business analytics..."></textarea>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #f0f4ff;margin:20px 0;">
+      <h3 style="margin-bottom:18px;"><i class="ri-lock-line" style="margin-right:6px;"></i>Change Password</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="inp-pass" class="form-input" placeholder="Min 6 characters">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="inp-confirm" class="form-input" placeholder="Repeat password">
+        </div>
+      </div>
+
+      <button class="save-btn" onclick="saveProfile()">
+        <i class="ri-save-line"></i> Save Changes
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // Load user data
+  const userName    = localStorage.getItem('bizforce_user')    || 'User';
+  const userRole    = localStorage.getItem('bizforce_role')    || 'CRM Admin';
+  const userEmail   = localStorage.getItem('bizforce_email')   || '';
+  const userPhone   = localStorage.getItem('bizforce_phone')   || '';
+  const userLoc     = localStorage.getItem('bizforce_location')|| '';
+  const userCompany = localStorage.getItem('bizforce_company') || 'BizForce Pvt Ltd';
+  const userBio     = localStorage.getItem('bizforce_bio')     || '';
+
+  const initial = userName.charAt(0).toUpperCase();
+
+  // Set UI
+  document.getElementById('bigAvatar').textContent    = initial;
+  document.getElementById('sidebar-avatar').textContent = initial;
+  document.getElementById('sidebar-name').textContent  = userName;
+  document.getElementById('displayName').textContent   = userName;
+  document.getElementById('displayRole').textContent   = userRole + ' · BizForce';
+
+  // Pre-fill form
+  document.getElementById('inp-name').value    = userName;
+  document.getElementById('inp-role').value    = userRole;
+  document.getElementById('inp-email').value   = userEmail;
+  document.getElementById('inp-phone').value   = userPhone;
+  document.getElementById('inp-location').value= userLoc;
+  document.getElementById('inp-company').value = userCompany;
+  document.getElementById('inp-bio').value     = userBio;
+
+  // Stats from customers
+  const customers = JSON.parse(localStorage.getItem('bizforceCustomers')) || [];
+  const revenue = customers.reduce((s,c)=>s+(Number(c.revenue)||0), 0);
+  document.getElementById('statCust').textContent = customers.length;
+
+  function formatRev(val) {
+    if (val >= 10000000) return '₹'+(val/10000000).toFixed(1)+'Cr';
+    if (val >= 100000)   return '₹'+(val/100000).toFixed(1)+'L';
+    if (val >= 1000)     return '₹'+(val/1000).toFixed(1)+'K';
+    return '₹'+val;
+  }
+  document.getElementById('statRev').textContent = formatRev(revenue);
+
+  function saveProfile() {
+    const name     = document.getElementById('inp-name').value.trim();
+    const role     = document.getElementById('inp-role').value.trim();
+    const email    = document.getElementById('inp-email').value.trim();
+    const phone    = document.getElementById('inp-phone').value.trim();
+    const loc      = document.getElementById('inp-location').value.trim();
+    const company  = document.getElementById('inp-company').value.trim();
+    const bio      = document.getElementById('inp-bio').value.trim();
+    const pass     = document.getElementById('inp-pass').value;
+    const confirm  = document.getElementById('inp-confirm').value;
+
+    if (!name) { showToast('⚠️ Name cannot be empty!'); return; }
+    if (pass && pass !== confirm) { showToast('⚠️ Passwords do not match!'); return; }
+    if (pass && pass.length < 6)  { showToast('⚠️ Password too short!'); return; }
+
+    localStorage.setItem('bizforce_user',     name);
+    localStorage.setItem('bizforce_role',     role);
+    localStorage.setItem('bizforce_email',    email);
+    localStorage.setItem('bizforce_phone',    phone);
+    localStorage.setItem('bizforce_location', loc);
+    localStorage.setItem('bizforce_company',  company);
+    localStorage.setItem('bizforce_bio',      bio);
+
+    // Update UI
+    document.getElementById('bigAvatar').textContent     = name.charAt(0).toUpperCase();
+    document.getElementById('sidebar-avatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('sidebar-name').textContent   = name;
+    document.getElementById('displayName').textContent    = name;
+    document.getElementById('displayRole').textContent    = role + ' · BizForce';
+
+    showToast('✅ Profile saved successfully!');
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('bizforce_user');
+    window.location.href = 'index.html';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 2500);
+  }
+  /* LOAD DARK MODE */
+if(localStorage.getItem("darkMode") === "enabled"){
+document.body.classList.add("dark-mode");
+}
+
+function toggleDarkMode(){
+
+document.body.classList.toggle("dark-mode");
+
+if(document.body.classList.contains("dark-mode")){
+localStorage.setItem("darkMode","enabled");
+}else{
+localStorage.setItem("darkMode","disabled");
+}
+
+}
+</script>
+
+</body>
+</html>

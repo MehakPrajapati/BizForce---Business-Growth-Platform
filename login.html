@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizForce – Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: #f0f4ff;
+        }
+
+        /* ===== LEFT PANEL ===== */
+        #left-panel {
+            width: 50%;
+            background: linear-gradient(145deg, rgb(0,0,130) 0%, rgb(0,30,160) 50%, rgb(20,80,200) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background circles decoration */
+        #left-panel::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: rgba(73,190,230,0.12);
+            top: -100px;
+            right: -100px;
+        }
+
+        #left-panel::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(73,190,230,0.08);
+            bottom: -80px;
+            left: -60px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 60px;
+            z-index: 1;
+        }
+
+        .brand-logo i {
+            font-size: 36px;
+            color: rgb(73,190,230);
+        }
+
+        .brand-logo span {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        .left-heading {
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+
+        .left-heading span {
+            color: rgb(73,190,230);
+        }
+
+        .left-sub {
+            font-size: 18px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.7;
+            margin-bottom: 50px;
+            z-index: 1;
+            max-width: 420px;
+        }
+
+        /* Feature list */
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            z-index: 1;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(73,190,230,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-icon i {
+            font-size: 20px;
+            color: rgb(73,190,230);
+        }
+
+        .feature-text {
+            font-size: 16px;
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* ===== RIGHT PANEL ===== */
+        #right-panel {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: #f0f4ff;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 440px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 10px rgba(0,0,130,0.08);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            color: #888;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: rgb(0,0,130);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,130,0.3);
+        }
+
+        /* Form card */
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,130,0.1);
+        }
+
+        .form-card h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: rgb(0,0,130);
+            margin-bottom: 6px;
+        }
+
+        .form-card p {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 28px;
+        }
+
+        /* Input group */
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgb(0,0,130);
+            margin-bottom: 7px;
+            letter-spacing: 0.3px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #aaa;
+            transition: 0.3s;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            border: 1.5px solid #e0e7ff;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            color: #333;
+            background: #f8faff;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-wrap input:focus {
+            border-color: rgb(73,190,230);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(73,190,230,0.15);
+        }
+
+        .input-wrap input:focus + i,
+        .input-wrap i:has(+ input:focus) {
+            color: rgb(73,190,230);
+        }
+
+        .input-wrap input:focus ~ i {
+            color: rgb(73,190,230);
+        }
+
+        /* Eye toggle for password */
+        .eye-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            left: auto !important;
+            cursor: pointer;
+            font-size: 18px !important;
+            color: #aaa !important;
+        }
+
+        .eye-toggle:hover {
+            color: rgb(0,0,130) !important;
+        }
+
+        /* Forgot password */
+        .forgot {
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 18px;
+        }
+
+        .forgot a {
+            font-size: 13px;
+            color: rgb(73,190,230);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot a:hover {
+            color: rgb(0,0,130);
+        }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, rgb(73,190,230), rgb(0,120,255));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, rgb(0,0,130), rgb(0,80,180));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,130,0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 22px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e0e7ff;
+        }
+
+        .divider span {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        /* Google button */
+        .google-btn {
+            width: 100%;
+            padding: 13px;
+            background: white;
+            border: 1.5px solid #e0e7ff;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            color: #444;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .google-btn:hover {
+            border-color: rgb(73,190,230);
+            background: #f0f9ff;
+        }
+
+        .google-btn i {
+            font-size: 20px;
+            color: #EA4335;
+        }
+
+        /* Error message */
+        .error-msg {
+            display: none;
+            background: #fff0f0;
+            border: 1px solid #ffcccc;
+            color: #cc0000;
+            font-size: 13px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        /* Success toast */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgb(0,0,130);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 6px 20px rgba(0,0,130,0.3);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+
+            #left-panel {
+                width: 100%;
+                padding: 40px 30px;
+                min-height: auto;
+            }
+
+            .left-heading { font-size: 32px; }
+            .features { display: none; }
+
+            #right-panel {
+                width: 100%;
+                padding: 30px 20px;
+            }
+
+            .form-card { padding: 28px 22px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== LEFT PANEL ===== -->
+    <div id="left-panel">
+
+        <div class="brand-logo">
+            <i class="ri-briefcase-4-fill"></i>
+            <span>BizForce</span>
+        </div>
+
+        <h1 class="left-heading">
+            Grow Your Business<br><span>Smarter & Faster</span>
+        </h1>
+
+        <p class="left-sub">
+            Join thousands of companies using BizForce to manage customers,
+            automate marketing, and track business growth — all in one place.
+        </p>
+
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-icon"><i class="ri-user-settings-line"></i></div>
+                <span class="feature-text">Smart CRM & Customer Management</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="ri-line-chart-line"></i></div>
+                <span class="feature-text">AI-Powered Analytics & Reports</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="ri-shield-check-line"></i></div>
+                <span class="feature-text">Secure Cloud Infrastructure</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="ri-customer-service-2-line"></i></div>
+                <span class="feature-text">24/7 Support & Assistance</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== RIGHT PANEL ===== -->
+    <div id="right-panel">
+
+        <div class="form-container">
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" onclick="switchTab('signup')">Create Account</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="login-form">
+                <div class="form-card">
+                    <h2>Welcome Back 👋</h2>
+                    <p>Login to your BizForce account</p>
+
+                    <div class="error-msg" id="login-error">
+                        <i class="ri-error-warning-line"></i> Invalid email or password.
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <div class="input-wrap">
+                            <i class="ri-mail-line"></i>
+                            <input type="email" id="login-email" placeholder="you@company.com">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div class="input-wrap">
+                            <i class="ri-lock-line"></i>
+                            <input type="password" id="login-password" placeholder="Enter your password">
+                            <i class="ri-eye-off-line eye-toggle" onclick="togglePass('login-password', this)"></i>
+                        </div>
+                    </div>
+
+                    <div class="forgot">
+                        <a href="#">Forgot password?</a>
+                    </div>
+
+                    <button class="submit-btn" onclick="handleLogin()">
+                        <i class="ri-login-box-line"></i> Login to BizForce
+                    </button>
+
+                    <div class="divider"><span>or continue with</span></div>
+
+                    <button class="google-btn" onclick="showToast('Google login coming soon!')">
+                        <i class="ri-google-fill"></i> Continue with Google
+                    </button>
+                </div>
+            </div>
+
+            <!-- SIGNUP FORM -->
+            <div id="signup-form" style="display:none;">
+                <div class="form-card">
+                    <h2>Start Free Trial 🚀</h2>
+                    <p>No credit card required — cancel anytime</p>
+
+                    <div class="error-msg" id="signup-error">
+                        <i class="ri-error-warning-line"></i> Please fill all fields correctly.
+                    </div>
+
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <div class="input-wrap">
+                            <i class="ri-user-line"></i>
+                            <input type="text" id="signup-name" placeholder="Your full name">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Work Email</label>
+                        <div class="input-wrap">
+                            <i class="ri-mail-line"></i>
+                            <input type="email" id="signup-email" placeholder="you@company.com">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div class="input-wrap">
+                            <i class="ri-lock-line"></i>
+                            <input type="password" id="signup-password" placeholder="Min 6 characters">
+                            <i class="ri-eye-off-line eye-toggle" onclick="togglePass('signup-password', this)"></i>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Company Name <span style="color:#aaa;font-weight:400">(optional)</span></label>
+                        <div class="input-wrap">
+                            <i class="ri-building-line"></i>
+                            <input type="text" id="signup-company" placeholder="Your company name">
+                        </div>
+                    </div>
+
+                    <button class="submit-btn" onclick="handleSignup()">
+                        <i class="ri-rocket-line"></i> Create Free Account
+                    </button>
+
+                    <div class="divider"><span>or continue with</span></div>
+
+                    <button class="google-btn" onclick="showToast('Google signup coming soon!')">
+                        <i class="ri-google-fill"></i> Sign up with Google
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast">
+        <i class="ri-checkbox-circle-line"></i>
+        <span id="toast-msg">Success!</span>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (tab === 'login') {
+                tabs[0].classList.add('active');
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('signup-form').style.display = 'none';
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('signup-form').style.display = 'block';
+            }
+        }
+
+        function togglePass(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('ri-eye-off-line', 'ri-eye-line');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('ri-eye-line', 'ri-eye-off-line');
+            }
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const errorEl = document.getElementById('login-error');
+
+            if (!email || !password) {
+                errorEl.style.display = 'flex';
+                errorEl.innerHTML = '<i class="ri-error-warning-line"></i> Please enter both email and password.';
+                return;
+            }
+
+            if (!email.includes('@')) {
+                errorEl.style.display = 'flex';
+                errorEl.innerHTML = '<i class="ri-error-warning-line"></i> Please enter a valid email.';
+                return;
+            }
+
+            errorEl.style.display = 'none';
+            showToast('Login successful! Redirecting...');
+           setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+        }
+
+      function handleSignup() {
+    const name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value.trim();
+    const errorEl = document.getElementById('signup-error');
+
+    if (!name || !email || !password) {
+        errorEl.style.display = 'flex';
+        errorEl.innerHTML = '<i class="ri-error-warning-line"></i> Please fill all required fields.';
+        return;
+    }
+    if (!email.includes('@')) {
+        errorEl.style.display = 'flex';
+        errorEl.innerHTML = '<i class="ri-error-warning-line"></i> Please enter a valid email.';
+        return;
+    }
+    if (password.length < 6) {
+        errorEl.style.display = 'flex';
+        errorEl.innerHTML = '<i class="ri-error-warning-line"></i> Password must be at least 6 characters.';
+        return;
+    }
+
+    errorEl.style.display = 'none';
+    localStorage.setItem('bizforce_user', name); // ⬅️ yeh add kiya
+    showToast('Account created! Welcome to BizForce 🎉');
+   setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+}
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+    </script>
+
+</body>
+</html>
